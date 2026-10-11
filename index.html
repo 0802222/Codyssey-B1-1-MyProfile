@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="백엔드 개발자를 꿈꾸는 이초롱의 포트폴리오">
+  <title>이초롱 | Portfolio</title>
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/theme.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/animation.js" defer></script>
+  <script src="js/form.js" defer></script>
+  <script src="js/projects.js" defer></script>
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="주요 메뉴">
+      <a class="nav__logo" href="#hero">CHORONG</a>
+
+      <ul class="nav__menu" id="nav-menu">
+        <li><a class="nav__link" href="#about">About</a></li>
+        <li><a class="nav__link" href="#skills">Skills</a></li>
+        <li><a class="nav__link" href="#projects">Projects</a></li>
+        <li><a class="nav__link" href="#contact">Contact</a></li>
+      </ul>
+
+      <div class="nav__actions">
+        <button class="theme-toggle" type="button" aria-label="다크 모드로 전환">🌙</button>
+        <button class="nav__toggle" type="button" aria-controls="nav-menu" aria-expanded="false" aria-label="메뉴 열기">
+          <span class="nav__toggle-bar"></span>
+          <span class="nav__toggle-bar"></span>
+          <span class="nav__toggle-bar"></span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section id="hero" class="hero">
+      <div class="container hero__inner">
+        <p class="hero__greeting">Hello! 👋</p>
+        <h1 class="hero__title">
+          저는 <span class="hero__typing">백엔드 개발자를 꿈꾸는 이초롱</span>입니다.
+        </h1>
+        <p class="hero__desc">Java와 Spring으로 서버를 만들고, 동작 원리를 끝까지 파고드는 것을 좋아합니다.</p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#projects">프로젝트 보기</a>
+          <a class="btn btn--outline" href="#contact">연락하기</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="container">
+        <h2 class="section__title reveal">About Me</h2>
+        <div class="about reveal">
+          <img class="about__image" src="images/profile.svg" alt="이초롱의 프로필 이미지 (이니셜 CR 아바타)" width="200" height="200">
+          <div class="about__text">
+            <p>안녕하세요, 백엔드 개발자를 목표로 공부하고 있는 <strong>이초롱</strong>입니다.</p>
+            <p>Codyssey 과정에서 Mini Git, Redis, AWS, AI API 연동 같은 과제를 직접 구현하며 "왜 이렇게 동작하는가"를 설명할 수 있는 개발자가 되려고 노력하고 있습니다.</p>
+            <ul class="about__facts">
+              <li><span class="about__label">관심 분야</span> 서버 설계, 데이터베이스, 클라우드</li>
+              <li><span class="about__label">학습 중</span> 웹 프론트엔드 기초 (HTML · CSS · JavaScript)</li>
+              <li><span class="about__label">습관</span> 매일 알고리즘 풀이와 학습 기록</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="section section--alt">
+      <div class="container">
+        <h2 class="section__title reveal">Skills</h2>
+        <div class="skills">
+          <article class="skill-card reveal">
+            <h3 class="skill-card__title">Backend</h3>
+            <ul class="skill-card__list">
+              <li class="tag">Java</li>
+              <li class="tag">Spring Boot</li>
+              <li class="tag">Spring MVC</li>
+              <li class="tag">MyBatis</li>
+              <li class="tag">Python</li>
+              <li class="tag">FastAPI</li>
+            </ul>
+          </article>
+          <article class="skill-card reveal">
+            <h3 class="skill-card__title">Frontend</h3>
+            <ul class="skill-card__list">
+              <li class="tag">HTML</li>
+              <li class="tag">CSS</li>
+              <li class="tag">JavaScript</li>
+            </ul>
+          </article>
+          <article class="skill-card reveal">
+            <h3 class="skill-card__title">Data &amp; Tools</h3>
+            <ul class="skill-card__list">
+              <li class="tag">SQL</li>
+              <li class="tag">Redis</li>
+              <li class="tag">AWS</li>
+              <li class="tag">Git</li>
+              <li class="tag">GitHub Actions</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="section">
+      <div class="container">
+        <div class="reveal">
+          <h2 class="section__title">Projects</h2>
+          <p class="section__desc">GitHub API로 불러온 저장소 목록입니다. (포크한 저장소 제외)</p>
+        </div>
+        <div class="projects__filters" role="group" aria-label="언어별 필터"></div>
+        <div class="projects__content" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="contact" class="section section--alt">
+      <div class="container">
+        <h2 class="section__title reveal">Contact</h2>
+        <form class="contact-form reveal" novalidate>
+          <div class="form-field">
+            <label class="form-field__label" for="name">이름</label>
+            <input class="form-field__input" id="name" name="name" type="text" autocomplete="name" placeholder="홍길동" aria-describedby="name-error">
+            <p class="form-field__error" id="name-error"></p>
+          </div>
+          <div class="form-field">
+            <label class="form-field__label" for="email">이메일</label>
+            <input class="form-field__input" id="email" name="email" type="email" autocomplete="email" placeholder="name@example.com" aria-describedby="email-error">
+            <p class="form-field__error" id="email-error"></p>
+          </div>
+          <div class="form-field">
+            <label class="form-field__label" for="message">메시지</label>
+            <textarea class="form-field__input" id="message" name="message" rows="5" placeholder="10자 이상 입력해 주세요." aria-describedby="message-error"></textarea>
+            <p class="form-field__error" id="message-error"></p>
+          </div>
+          <button class="btn btn--primary contact-form__submit" type="submit">보내기</button>
+          <p class="contact-form__success" role="status"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p>&copy; 2026 이초롱. All rights reserved.</p>
+      <ul class="footer__links">
+        <li><a href="https://github.com/0802222" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        <li><a href="#hero">맨 위로</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <button class="scroll-top" type="button" aria-label="페이지 맨 위로 이동">↑</button>
+</body>
+</html>

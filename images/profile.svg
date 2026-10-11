@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="이니셜 CR 아바타">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="100" fill="url(#bg)"/>
+  <circle cx="100" cy="82" r="34" fill="#ffffff" fill-opacity="0.9"/>
+  <path d="M40 170c8-34 32-52 60-52s52 18 60 52" fill="#ffffff" fill-opacity="0.9"/>
+  <text x="100" y="92" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#4f46e5">CR</text>
+</svg>
