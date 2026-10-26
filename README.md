@@ -67,9 +67,32 @@ README의 모든 그림과 예시는 아래 **한 가지 상황**을 단계별�
 | `fetch` + `async/await`, 로딩 / 성공 / 실패 상태를 UI로 표현한 방법 | [2-8. 비동기 처리](#2-8-비동기-처리), [4-2. 요청 상태 전이](#4-2-요청-상태-전이) |
 | 이벤트 → 상태 변경 → DOM 업데이트 연결 (React 상태-렌더링의 기초) | [2-10. 상태 → 렌더링 패턴](#2-10-상태--렌더링-패턴), [9. 명령 처리 흐름](#9-명령-처리-흐름) |
 
+### 코드 작성 규칙과 이유
+
+과제는 기능 외에 코드를 **어떻게** 쓸지도 정해 두었다. 각 규칙이 막으려는 문제는 다음과 같다.
+
+| 과제 규칙 | 이유 | 지킨 방법 |
+| --- | --- | --- |
+| 외부 라이브러리 없이 HTML · CSS · JS만 사용 | 라이브러리가 감춰 주는 DOM 조작 · 이벤트 처리를 직접 겪어 봐야 React가 무엇을 대신해 주는지 이해할 수 있다 | `<script>`는 전부 `js/` 안의 파일 (외부 주소 0개) |
+| `onclick="..."` 속성 대신 `addEventListener` | HTML(구조)에 JS(동작)가 섞이지 않는다. `onclick`은 함수를 하나만 담아 다시 넣으면 덮어쓰지만, `addEventListener`는 여러 개를 등록할 수 있다. `{ passive: true }` 같은 옵션과 `removeEventListener`로 해제도 가능하다 | 모든 이벤트를 JS 파일에서 등록 ([2-6. DOM과 이벤트](#2-6-dom과-이벤트)) |
+| `var` 대신 `const` · `let` | `var`는 함수 단위로만 범위가 나뉘고 같은 이름을 다시 선언해도 에러가 나지 않아 실수를 숨긴다. `const`는 재할당까지 막는다 | 기본은 `const`, 값이 바뀌는 곳만 `let` (`currentTheme`, `typedLength`) |
+| 인라인 스타일(`style="..."`) 미사용 | 스타일이 HTML 곳곳에 흩어지면 한 곳에서 관리할 수 없고, CSS 변수 · 미디어 쿼리 · 다크 모드가 적용되지 않는다 | 모양은 CSS 클래스로만, JS는 `classList`로 클래스만 바꿈 |
+| `<script>`에 `defer` | `<head>`의 스크립트가 아직 만들어지지 않은 요소를 찾는 문제를 막는다 | 5개 파일 모두 `defer` ([2-1](#2-1-웹-페이지를-이루는-세-언어)) |
+
 ---
 
 ## 2. 배경 지식
+
+### 개념 찾아보기
+
+| 묶음 | 개념 | 위치 |
+| --- | --- | --- |
+| HTML · 접근성 | `defer`, 시맨틱 태그, Hero 섹션, 스크린 리더 | [2-1](#2-1-웹-페이지를-이루는-세-언어), [2-2](#2-2-시맨틱-태그) |
+| CSS 레이아웃 | Flexbox · Grid, 미디어 쿼리 · 모바일 퍼스트, CSS 변수 | [2-3](#2-3-flexbox와-grid), [2-4](#2-4-반응형-디자인), [2-5](#2-5-css-변수와-다크-모드) |
+| JS DOM · 이벤트 | DOM, `querySelector`, `addEventListener`, 콜백, `preventDefault()`, 이벤트 위임 | [2-6](#2-6-dom과-이벤트), [4-8](#4-8-이벤트-위임) |
+| JS 문법 | `const` · `let`, 화살표 함수, 템플릿 리터럴, 구조분해 할당, `map` · `filter` · `forEach` | [2-7](#2-7-es6-문법), [4-3](#4-3-배열-파이프라인-filter--map--join) |
+| 비동기 | `fetch`, Promise, `async` · `await`, `try` · `catch` | [2-8](#2-8-비동기-처리) |
+| 화면 갱신 | Intersection Observer, 상태 → 렌더링 | [2-9](#2-9-intersection-observer), [2-10](#2-10-상태--렌더링-패턴) |
 
 ### 2-1. 웹 페이지를 이루는 세 언어
 
@@ -88,6 +111,15 @@ README의 모든 그림과 예시는 아래 **한 가지 상황**을 단계별�
     ```html
     <script src="js/theme.js" defer></script>
     ```
+
+  - `defer` 유무에 따른 차이
+
+    | 구분 | 일반 `<script>` | `<script defer>` |
+    | --- | --- | --- |
+    | 다운로드 | HTML 파싱을 멈추고 받음 | HTML 파싱과 병렬로 받음 |
+    | 실행 시점 | 받자마자 바로 실행 | HTML 파싱이 끝난 뒤 (`DOMContentLoaded` 직전) |
+    | 실행 순서 | 적힌 순서 | 적힌 순서 보장 |
+    | `<head>`에서 `querySelector` | 아직 요소가 없어 `null` | 요소가 모두 만들어진 뒤라 항상 찾음 |
 
 ### 2-2. 시맨틱 태그
 
@@ -111,9 +143,51 @@ README의 모든 그림과 예시는 아래 **한 가지 상황**을 단계별�
     | `<article>` | 떼어 내도 혼자 의미가 통하는 내용 | 스킬 카드, 프로젝트 카드 |
     | `<footer>` | 저작권 · 연락처 같은 마무리 정보 | 저작권, GitHub 링크 |
 
+  - Hero 섹션
+    - 정의 : 페이지에 들어오자마자 처음 보이는 가장 큰 첫 화면 영역 (웹 디자인 용어, 데이터를 저장하는 곳이 아니다)
+    - 용도 : 방문자가 몇 초 안에 "누구의, 무슨 페이지인지" 알고 다음 행동을 고르게 한다
+    - 주로 넣는 것
+
+      | 요소 | 역할 | 이 페이지 |
+      | --- | --- | --- |
+      | 큰 제목 (`h1`) | 페이지의 핵심 한 문장 | "저는 백엔드 개발자를 꿈꾸는 이초롱입니다." |
+      | 짧은 소개 | 제목을 보충하는 한두 줄 | Java · Spring 관심사 |
+      | CTA (Call To Action, 행동 유도) 버튼 | 다음에 갈 곳 안내 | 프로젝트 보기, 연락하기 |
+      | 시각 요소 | 첫인상 (배경 이미지, 일러스트, 애니메이션) | 타이핑 효과 |
+
+    - 구현 : `index.html`의 `<section id="hero">`, 타이핑 효과는 `js/animation.js`
+
   - 접근성
     - 모든 이미지에 의미 있는 `alt` (예: `alt="이초롱의 프로필 이미지 (이니셜 CR 아바타)"`)
     - 폼은 `<label for="email">` ↔ `<input id="email">`로 연결 → 라벨을 눌러도 입력칸에 포커스
+    - 스크린 리더 (Screen Reader) : 화면 내용을 음성으로 읽어 주는 **운영체제(OS)의 접근성 기능**이다. 브라우저 기능이 아니며, OS에서 켜 두면 브라우저 페이지도 읽어 준다
+
+      | 기기 | 이름 | 켜는 법 |
+      | --- | --- | --- |
+      | iPhone | VoiceOver | 설정 → 손쉬운 사용 → VoiceOver |
+      | Android | TalkBack | 설정 → 접근성 → TalkBack |
+      | Mac | VoiceOver | `Cmd + F5` |
+      | Windows | 내레이터 (Narrator) | `Win + Ctrl + Enter` |
+
+    - 스크린 리더는 화면 모양이 아니라 HTML 구조와 `aria-*` 속성을 읽기 때문에, 아래 속성으로 읽을 내용을 보충했다
+
+      <details>
+      <summary>스크린 리더를 위해 사용한 속성과 위치</summary>
+
+      | 코드 | 위치 | 역할 |
+      | --- | --- | --- |
+      | `lang="ko"` | `index.html` `<html>` | 한국어 발음으로 읽음 |
+      | `alt` | `index.html` 프로필 이미지 | 이미지 내용을 읽어 줌 |
+      | `aria-label` | `index.html` 테마 · 햄버거 · 맨 위로 버튼 | 아이콘만 있는 버튼의 이름 |
+      | `aria-expanded` | `index.html` 햄버거 버튼, `js/nav.js` `updateToggleLabel()` | 메뉴 열림 / 닫힘 상태 |
+      | `aria-live="polite"` | `index.html` `.projects__content` | 프로젝트 목록이 바뀌면 읽어 줌 |
+      | `role="status"` | `index.html` `.contact-form__success` | 폼 제출 성공 메시지를 읽어 줌 |
+      | `aria-describedby` | `index.html` 폼 입력칸 | 입력칸과 에러 문구를 연결 |
+      | `aria-invalid` | `js/form.js` `renderFieldError()` | 잘못 입력한 칸임을 알림 |
+      | `aria-pressed` | `js/projects.js` `createFilterButtons()` | 필터 버튼 선택 여부 |
+      | `aria-hidden="true"` | `js/projects.js` 로딩 스피너 | 장식용 요소는 읽지 않음 |
+
+      </details>
 
 ### 2-3. Flexbox와 Grid
 
@@ -193,6 +267,24 @@ README의 모든 그림과 예시는 아래 **한 가지 상황**을 단계별�
 - 과제 요구 : `onclick` 속성 대신 `addEventListener`, `click` · `submit` · `scroll` · `input` 이벤트 처리
 - 구현 : `js/` 전체 (사용 위치는 아래 표)
 - 세부 설명
+  - DOM (Document Object Model, 문서 객체 모델)이 필요한 이유
+    - HTML 파일은 그냥 **문자열**이다. 문자열에는 "세 번째 버튼에 class를 붙여라" 같은 명령을 내릴 수 없다
+    - 브라우저는 HTML을 해석해 태그 하나하나를 **객체**(속성 + 메서드를 가진 값)로 만든다. JS는 이 객체를 다룬다
+    - 브라우저는 원본 HTML 문자열이 아니라 **DOM을 보고 화면을 그린다**. 그래서 DOM을 바꾸면 화면이 바뀌고, 문자열을 바꾸면 아무 일도 일어나지 않는다
+  - 트리(Tree) 모양인 이유
+    - HTML은 태그 안에 태그가 들어가는 **중첩 구조**다 (`<body>` 안에 `<main>`, 그 안에 `<section>`)
+    - 모든 요소의 부모는 하나, 자식은 여러 개 → 그대로 옮기면 나무를 거꾸로 세운 모양이 된다
+  - 트리 구조 덕분에 되는 것
+
+    | 기능 | 설명 | 이 프로젝트 |
+    | --- | --- | --- |
+    | 선택자로 찾기 | 트리를 훑어 조건에 맞는 노드를 찾는다 | `querySelector('.nav__menu')` |
+    | 위치로 찾기 | 부모 · 자식 · 형제 방향으로 이동한다 | `event.target.closest('.filter-btn')` (부모 방향) |
+    | 내용 · 모양 바꾸기 | 노드 객체의 값을 바꾸면 화면이 바뀐다 | `textContent`, `innerHTML`, `classList` |
+    | 이벤트 버블링 | 자식에서 일어난 이벤트가 부모로 전달된다 | [4-8. 이벤트 위임](#4-8-이벤트-위임) |
+    | 상속 | 부모의 글꼴 · 색 · CSS 변수가 자식에게 이어진다 | `<html data-theme>` 하나로 전체 색 변경 |
+    | 통째로 교체 | 부모 안을 갈아 끼우면 자식도 모두 바뀐다 | `projectsContent.innerHTML = ...` |
+
   - 흐름 : **찾기**(`querySelector`) → **연결**(`addEventListener`) → **바꾸기**(`classList`, `textContent`, `innerHTML`)
 
     ```js
@@ -211,7 +303,23 @@ README의 모든 그림과 예시는 아래 **한 가지 상황**을 단계별�
     | `scroll` | `nav.js` window | 헤더 배경, 맨 위로 버튼 |
     | `input` | `form.js` 문의 폼 | 입력할 때마다 해당 필드 검증 |
 
-  - `onclick="..."`을 쓰지 않는 이유 : HTML(구조)과 JS(동작)가 섞이지 않고, 한 요소에 여러 함수를 걸 수 있다
+  - `onclick="..."`을 쓰지 않는 이유 : [코드 작성 규칙과 이유](#코드-작성-규칙과-이유) 참고
+  - 이벤트 처리와 콜백
+    - `addEventListener('click', 함수)`의 두 번째 인자가 **콜백**이다. 등록할 때는 실행되지 않고, 이벤트가 일어날 때 브라우저가 `event` 객체를 넣어 대신 호출한다
+    - 그래서 함수 이름 뒤에 `()`를 붙이지 않는다. `addEventListener('scroll', handleScroll())`라고 쓰면 등록하는 순간 한 번 실행되고, 그 반환값(`undefined`)이 등록된다
+
+      ```js
+      window.addEventListener('scroll', handleScroll, { passive: true }); // nav.js : 함수 자체를 넘김
+      ```
+
+  - `event.preventDefault()` : 내가 설계한 동작을 하기 위해 브라우저의 기본 동작을 취소한다
+
+    | 위치 | 취소한 기본 동작 | 대신 하는 일 |
+    | --- | --- | --- |
+    | `form.js` submit | 페이지 새로고침 + 서버로 전송 (입력값과 에러 메시지가 사라짐) | JS로 검증하고 성공 메시지 표시 |
+    | `nav.js` 앵커 click | `#about` 위치로 순간 이동 | `scrollIntoView({ behavior: 'smooth' })`로 부드럽게 이동 |
+
+    - `stopPropagation()`과는 다르다. 그쪽은 이벤트가 부모로 전달되는 것(버블링)을 막는다
   - `textContent` vs `innerHTML`
     - `textContent` : 글자만 바꿈 (에러 메시지, 테마 아이콘)
     - `innerHTML` : HTML 문자열을 해석해 요소를 만듦 (프로젝트 카드) → 외부 문자열은 `escapeHTML`로 먼저 처리
@@ -222,6 +330,7 @@ README의 모든 그림과 예시는 아래 **한 가지 상황**을 단계별�
 | --- | --- | --- |
 | `const` / `let` | 블록 단위로 유효한 변수 선언 (`const`는 재할당 불가) | `var` 대체 |
 | 화살표 함수 | `(인자) => 결과` 형태의 짧은 함수 | 짧은 콜백 |
+| 콜백 함수 | 다른 함수에 인자로 넘겨서, 그 함수가 나중에 대신 호출하는 함수 | "끝나면 이거 불러 줘" |
 | 템플릿 리터럴 | 백틱(`` ` ``) 안에 `${값}`을 끼워 넣는 문자열 | HTML 조립 |
 | 구조분해 할당 | 객체 · 배열에서 필요한 값만 꺼내 변수로 만드는 문법 | 값 골라 꺼내기 |
 | `map` / `filter` / `forEach` | 배열을 변환 / 거르기 / 순회하는 메서드 | 반복문 대신 |
@@ -242,6 +351,35 @@ README의 모든 그림과 예시는 아래 **한 가지 상황**을 단계별�
     // 템플릿 리터럴 : 카드 HTML 조립
     const createProjectCard = ({ name, stars }) => `<h3>${escapeHTML(name)}</h3><span>⭐ ${stars}</span>`;
     ```
+
+  - 콜백을 넘긴 곳
+
+    | 위치 | 콜백을 받는 쪽 | 호출되는 때 |
+    | --- | --- | --- |
+    | 모든 JS 파일 | `addEventListener` | 이벤트가 일어날 때 |
+    | `animation.js` | `IntersectionObserver` | 요소가 화면에 들어올 때 |
+    | `animation.js` | `setTimeout(typeNextChar, 90)` | 90ms 뒤 |
+    | `projects.js` | `map(toProject)`, `filter(...)` | 배열 요소마다 |
+
+  - 구조분해 할당 (Destructuring Assignment)
+    - 이름의 뜻 : `{ name, fork }`처럼 값을 묶어 **구조를 만드는 것**의 반대로, 묶인 구조를 **해체**(de-structure)해 변수로 나눠 담는다
+    - 만드는 문법과 꺼내는 문법이 거울처럼 같다
+
+      ```js
+      const repo = { name, fork };  // 구조 만들기
+      const { name, fork } = repo;  // 구조 해체하기
+      ```
+
+    - 사용한 곳
+
+      | 위치 | 코드 | 꺼낸 값 |
+      | --- | --- | --- |
+      | `projects.js` `toProject()` | `({ name, description, html_url, ... }) =>` | API 응답의 수십 개 필드 중 화면에 쓰는 6개 |
+      | `projects.js` `renderProjects()` | `const { status, repos, ... } = projectsState;` | 상태 객체의 값 |
+      | `projects.js` `fetchRepos()` | `data.filter(({ fork }) => !fork)` | 포크 여부 |
+      | `nav.js` `handleScroll()` | `const { scrollY } = window;` | 현재 스크롤 위치 |
+      | `animation.js` | `({ isIntersecting, target }) =>` | 화면에 들어왔는지, 대상 요소 |
+      | `form.js` submit | `const { name } = Object.fromEntries(...)` | 폼의 이름 값 |
 
   - `forEach` : `nav.js`에서 모든 앵커 링크에 클릭 이벤트 등록, `animation.js`에서 등장 대상 관찰 등록
   - `var` 미사용 : 프로젝트 전체 `grep "var "` 결과 0건
@@ -677,6 +815,13 @@ sequenceDiagram
 - 세부 설명
   - 문제 : `innerHTML`로 다시 그리면 예전 버튼이 사라지면서 거기에 걸어 둔 리스너도 같이 사라진다
   - 해결 : 다시 그려지지 않는 부모(`.projects__filters`)에 한 번만 등록
+  - 비교 : 필터 버튼이 N개일 때
+
+    | 방식 | 등록 횟수 | 필터를 누를 때마다 |
+    | --- | --- | --- |
+    | 자식(버튼)마다 등록 | N번 (`forEach`) | 다시 그려진 새 버튼 N개에 **또 등록**해야 함 (빠뜨리면 클릭이 안 됨) |
+    | 부모에 한 번 등록 (위임) | 1번 | 부모는 그대로 남아 있으므로 할 일 없음 |
+
   - `event.target.closest('.filter-btn')` : 버튼 안의 글자를 눌러도 가장 가까운 버튼을 찾아 줌
   - `button.dataset.language` : 버튼의 `data-language="Java"` 값을 읽음
 
@@ -824,6 +969,8 @@ Codyssey-B1-1-MyProfile/
 │   └── screenshots/      # README 시연 이미지
 ├── docs/
 │   └── evaluation-qa.md  # 평가 대비 문답
+├── scripts/
+│   └── demo.mjs          # 시연 자동화 (정적 검사 + 헤드리스 Chrome 기능 테스트)
 └── README.md
 ```
 
@@ -1021,3 +1168,43 @@ $ grep -n 'style="' index.html js/*.js
   ```js
   window.fetch = () => Promise.resolve(new Response('{"message":"API rate limit exceeded"}', { status: 403 }));
   ```
+
+### 자동 시연 스크립트
+
+위 표의 테스트를 손으로 하나씩 하지 않아도 되도록 스크립트로 만들었다.
+
+```bash
+$ node scripts/demo.mjs
+```
+
+- 준비물 : Node.js 22 이상, Chrome (외부 패키지 설치 없음)
+- 하는 일
+    - 정적 검사 : 폴더 구조, `defer`, `var` · `onclick` · 인라인 스타일 0건, 시맨틱 태그, `alt`, `label for`, CSS 변수 · 브레이크포인트 · Grid 등 25개 항목
+    - 배포 확인 : GitHub Pages 주소 응답(200), GitHub API 남은 호출 수
+    - 브라우저 테스트 : 로컬 서버와 헤드리스 Chrome을 띄워 실제로 클릭 · 입력 · 스크롤하며 위 표의 항목을 확인
+    - 로딩 · 403 · 네트워크 끊김은 Chrome DevTools Protocol의 `Fetch` 기능으로 GitHub API 응답을 가로채 재현
+    - 단계마다 스크린샷을 `demo-output/`에 저장 (Git 추적 제외)
+- 실제 GitHub API를 9회 호출하므로 시간당 60회 한도 안에서 6번 정도 반복 실행 가능
+
+실행 결과 (요약)
+
+```text
+■ 3. GitHub API 연동 (데스크톱 1280px)
+  ✅ 성공 상태: 카드 리스트 렌더링  → 카드 38개, 필터 "전체 (38)"
+  ✅ [보너스] 언어 필터 (filter)  → "Python (5)" 클릭 → 카드 5개, 모두 Python
+  ✅ 로딩 상태: 스피너 + "로딩 중..."
+  ✅ 에러 상태 (403 레이트 리밋)  → GitHub API 요청 한도(시간당 60회)를 초과했습니다. 잠시 후 다시 시도해 주세요.
+  ✅ 에러 상태 (네트워크 끊김) + 다시 시도 버튼
+  ✅ 다시 시도 → 성공 복구  → 카드 38개
+  ✅ 에러 상태 (404 없는 사용자)  → ?user=this-user-should-not-exist-b11
+  ✅ 빈 상태: "표시할 프로젝트가 없습니다"  → ?user=ghost
+
+■ 4. 스크롤 인터랙션 (데스크톱 1280px)
+  ✅ 헤더 배경 변경 (기준 60px)  → 50px: 없음, 100px: .scrolled
+  ✅ 맨 위로 버튼 (기준 300px)  → 100px: 숨김, 400px: 보임, 클릭 후 scrollY 0
+  ✅ 부드러운 스크롤 (메뉴 → Projects)  → 0 → 83(이동 중) → 1521px, 주소에 # 없음
+  ✅ 스크롤 애니메이션 (threshold 0.2)  → 폼에 .is-visible 추가
+
+■ 요약
+  통과 55 / 전체 55
+```
